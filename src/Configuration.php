@@ -21,9 +21,9 @@ class Configuration
         $this->dotenv = $dotenv;
         $this->dotenv->load();
 
-        $this->region = $_ENV['region']??'';
-        $this->clientId = $_ENV['clientId']??'';
-        $this->userpoolId = $_ENV['userpoolId']??'';
+        $this->region = $_ENV['REGION']??'';
+        $this->clientId = $_ENV['CLIENT_ID']??'';
+        $this->userpoolId = $_ENV['USER_POOL_ID']??'';
 
     }
     /**

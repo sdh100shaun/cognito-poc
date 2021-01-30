@@ -179,7 +179,7 @@ class CognitoIdentityProvider
     private function setAuthenticationCookie(string $accessToken) : void
     {
         /**
-         * not secure way of stiring for demo purposes only
+         * not secure way of storing for demo purposes only
          */
         setcookie(self::COOKIE_NAME, $accessToken, time() + 3600);
     }
