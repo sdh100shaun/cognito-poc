@@ -11,4 +11,12 @@ class Result extends AwsResult implements ResultInterface
         return !empty($this->get('error'));
     }
 
+    private function getChallengeName():string {
+        return  parent::get('ChallengeName');
+    }
+
+    public function requiresNewPassword(): bool
+    {
+        return  $this->getChallengeName() === 'NEW_PASSWORD_REQUIRED';
+    }
 }

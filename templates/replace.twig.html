@@ -1,0 +1,35 @@
+{% extends "layout.html.twig" %}
+{% block body %}
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <h1 class="govuk-heading-xl">Sign in to your DVSA account</h1>
+    <form method="post" action="/login" enctype="multipart/form-data">
+
+        <div class="govuk-form-group">
+
+            <label class="govuk-label" for="password">
+                Old Password
+            </label>
+
+            <input class="govuk-input govuk-input--width-10" id="password" name="password" type="password">
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="password">
+                New Password
+            </label>
+
+            <input class="govuk-input govuk-input--width-10" id="newpassword" name="newpassword" type="password">
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="password">
+                Confirm Password
+            </label>
+
+            <input class="govuk-input govuk-input--width-10" id="confirmpassword" name="confirmpassword"
+                   type="password">
+        </div>
+        <button class="govuk-button" data-module="govuk-button">
+            Save
+        </button>
+    </form>
+</main>
+{% endblock %}

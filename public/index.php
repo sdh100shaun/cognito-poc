@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Application\Application;
 use App\Configuration;
 use App\Services\CognitoIdentityProvider;
+use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
@@ -27,7 +28,19 @@ $container->set('configuration', function (){
 
 $container->set('identity', function() use ($container) {
     return new  CognitoIdentityProvider(
+        $container->get('cognitoClient'),
         $container->get('configuration')
+    );
+});
+
+$container->set('cognitoClient', function() use ($container) {
+    $configuration = $container->get('configuration');
+    return new CognitoIdentityProviderClient(
+        [
+            'profile' => $configuration->getProfile(),
+            'region' => $configuration->getRegion(),
+            'version' => 'latest'
+        ]
     );
 });
 // Instantiate the app

@@ -11,6 +11,7 @@ class Configuration
 {
     private $region;
     private $clientId;
+    private $profile;
     /**
      * @var Dotenv
      */
@@ -24,6 +25,7 @@ class Configuration
         $this->region = $_ENV['REGION']??'';
         $this->clientId = $_ENV['CLIENT_ID']??'';
         $this->userpoolId = $_ENV['USER_POOL_ID']??'';
+        $this->profile = $_ENV['PROFILE']??'default';
 
     }
     /**
@@ -74,6 +76,22 @@ class Configuration
         $this->userpoolId = $userpoolId;
     }
     private $userpoolId;
+
+    /**
+     * @return string
+     */
+    public function getProfile(): string
+    {
+        return $this->profile;
+    }
+
+    /**
+     * @param string $profile
+     */
+    public function setProfile(string $profile): void
+    {
+        $this->profile = $profile;
+    }
 
 
 }

@@ -14,20 +14,33 @@ return function (App $app) {
     });
 
     $app->get('/', function (Request $request, Response $response) use ($view) {
-         return $view->render($response, 'index.twig.html', [
+        return $view->render($response, 'index.twig.html', [
         ]);
     });
+
 
     $app->post('/login', function (Request $request, Response $response) use ($view) {
         /**
          * @var \App\Services\CognitoIdentityProvider
          */
         $identity = $this->get('identity');
-
+        $identity->initialise();
         $args = $request->getParsedBody();
-        $identity->initialize();
+        /**
+         * @var \Aws\ResultInterface
+         */
         $result = $identity->authenticate($args['username'], $args['password']);
 
-        var_dump($result);
+        if ($result->get('ChallengeName') === 'NEW_PASSWORD_REQUIRED') {
+            return $view->render($response, 'replace.twig.html', [
+            ]);
+        }
+        else {
+            $url = '/secure';
+            $response->withHeader('Location:'.$url);
+        }
+
     });
+
+
 };
