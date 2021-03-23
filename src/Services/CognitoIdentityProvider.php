@@ -11,7 +11,6 @@ use Exception;
 class CognitoIdentityProvider
 {
 
-    private const COOKIE_NAME = 'aws-cognito-app-access-token';
 
     /**
      * @var CognitoIdentityProviderClient
@@ -29,16 +28,18 @@ class CognitoIdentityProvider
     {
         $this->configuration = $configuration;
         $this->client = $client;
+
     }
 
-    public function initialise(): void
+    public function initialise($accessToken = null): void
     {
         try {
             $this->user = $this->client->getUser([
-                'AccessToken' => $this->getAuthenticationCookie()
+                'AccessToken' => $accessToken
             ]);
         } catch (\Exception  $e) {
             // an exception indicates the accesstoken is incorrect - $this->user will still be null
+
         }
     }
 
@@ -57,20 +58,25 @@ class CognitoIdentityProvider
         } catch (\Exception $e) {
             return (new Result(['error' => $e->getMessage()]));
         }
-        $this->setAuthenticationCookie($result->get('Session'));
         return $result;
     }
 
     public function replaceTemporaryPassword(
-        string $accessToken,
-        string $previousPassword,
+        string $username,
         string $newPassword
     ): ResultInterface {
-        return $this->client->changePassword([
-            'AccessToken' => $accessToken,
-            'PreviousPassword' => $previousPassword,
-            'ProposedPassword' => $newPassword
-        ]);
+         $result = $this->client->respondToAuthChallengeAsync([
+            'ClientId' => $this->configuration->getClientId(),
+            'UserPoolId' => $this->configuration->getUserpoolId(),
+            'Session' => $this->getAuthenticationCookie(),
+            'ChallengeResponses' => [
+                'NEW_PASSWORD' => $newPassword,
+                'USERNAME' => $username
+            ],
+            'ChallengeName' => 'NEW_PASSWORD_REQUIRED'
+        ])->wait();
+
+         return  $result;
     }
 
 
@@ -180,16 +186,34 @@ class CognitoIdentityProvider
         }
     }
 
-    private function setAuthenticationCookie(string $accessToken): void
+    /**
+     * Create Cognito secret hash
+     *
+     * @param string $username
+     * @param string $secret
+     *
+     * @return string
+     */
+    protected function cognitoSecretHash(string $username, string $secret)
     {
-        /**
-         * not secure way of storing for demo purposes only
-         */
-        setcookie(self::COOKIE_NAME, $accessToken, time() + 3600);
+        return $this->hash($username . $this->configuration->getClientId(), $secret);
     }
 
-    private function getAuthenticationCookie(): string
+    /**
+     * Create HMAC from string
+     *
+     * @param  string $message
+     * @return string
+     */
+    protected function hash($message,$secret)
     {
-        return $_COOKIE[self::COOKIE_NAME] ?? '';
+        $hash = hash_hmac(
+            'sha256',
+            $message,
+            $secret,
+            true
+        );
+
+        return base64_encode($hash);
     }
 }

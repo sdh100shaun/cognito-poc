@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+{% block body %}
+<h1>Session data</h1>
+<table class="pure-table" style="width: 90%; overflow-wrap: break-word;
+  word-wrap: break-word;">
+{% for key,item in session %}
+<tr>
+<td style="width:55px;">{{key}} : </td>
+    <td style="width:150px;">{{item}}</td>
+</tr>
+{% endfor %}
+</table>
+<br />
+<br />
+{% endblock %}

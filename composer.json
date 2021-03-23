@@ -4,6 +4,7 @@
   "type": "project",
   "require": {
     "aws/aws-sdk-php": "^3.172",
+    "bryanjhv/slim-session": "dev-master",
     "php-di/php-di": "^6.1",
     "slim/psr7": "dev-master",
     "slim/slim": "^4.0",

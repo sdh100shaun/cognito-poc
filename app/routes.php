@@ -32,12 +32,58 @@ return function (App $app) {
         $result = $identity->authenticate($args['username'], $args['password']);
 
         if ($result->get('ChallengeName') === 'NEW_PASSWORD_REQUIRED') {
-            return $view->render($response, 'replace.twig.html', [
+            return $view->render($response, 'replace.twig.html', ['username'=>$args['username']
             ]);
         }
+        else if(!isset($result['error'])){
+            $session = $this->get('session');
+            /**
+             *var /SlimSession/SessionHelper
+             */
+           $session->set('cog-result', $result);
+           $url = '/secure';
+           return $response->withHeader('Location',$url);
+        }
+        return $view->render($response, 'index.twig.html', ['error'=>$result['error']]);
+    });
+
+    $app->post('/replace', function (Request $request, Response $response) use ($view) {
+        /**
+         * @var \App\Services\CognitoIdentityProvider
+         */
+        $identity = $this->get('identity');
+        $identity->initialise();
+        $args = $request->getParsedBody();
+        /**
+         * @var \Aws\ResultInterface
+         */
+        $previousPassword = $args['password'];
+        if($args['newPassword'] === $args['confirmPassword'] ){
+            $newPassword = $args['newPassword'];
+        }
         else {
-            $url = '/secure';
-            $response->withHeader('Location:'.$url);
+            return "passwords don't match";
+        }
+        $username = $args['username'];
+        $result = $identity->replaceTemporaryPassword(
+            $username,
+            $newPassword
+        );
+
+
+        $url = '/secure';
+        return $response->withHeader('Location',$url);
+
+    });
+
+    $app->get('/secure',function (Request $request, Response $response) use ($view) {
+        $session = $this->get('session');
+        if($session->exists('cog-result')){
+            return $view->render($response, 'secure.twig.html', ['value'=>'secure','session'=>$session->get('cog-result')['AuthenticationResult']]);
+        }else
+        {
+            $url = '/';
+            return $response->withHeader('Location',$url);
         }
 
     });

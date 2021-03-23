@@ -2,7 +2,7 @@
 {% block body %}
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <h1 class="govuk-heading-xl">Sign in to your DVSA account</h1>
-    <form method="post" action="/login" enctype="multipart/form-data">
+    <form method="post" action="/replace" enctype="multipart/form-data">
 
         <div class="govuk-form-group">
 
@@ -17,16 +17,17 @@
                 New Password
             </label>
 
-            <input class="govuk-input govuk-input--width-10" id="newpassword" name="newpassword" type="password">
+            <input class="govuk-input govuk-input--width-10" id="newpassword" name="newPassword" type="password">
         </div>
         <div class="govuk-form-group">
             <label class="govuk-label" for="password">
                 Confirm Password
             </label>
 
-            <input class="govuk-input govuk-input--width-10" id="confirmpassword" name="confirmpassword"
+            <input class="govuk-input govuk-input--width-10" id="confirmpassword" name="confirmPassword"
                    type="password">
         </div>
+        <input name="username" type="hidden" value="{{username}}">
         <button class="govuk-button" data-module="govuk-button">
             Save
         </button>

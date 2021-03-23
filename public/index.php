@@ -8,8 +8,10 @@ use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
+use Slim\Middleware\Session;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use SlimSession\Helper;
 
 require __DIR__ . '/../vendor/autoload.php';
 $containerBuilder = new ContainerBuilder();
@@ -43,11 +45,22 @@ $container->set('cognitoClient', function() use ($container) {
         ]
     );
 });
+
+// Register globally to app
+$container->set('session', function () {
+    return new Helper();
+});
 // Instantiate the app
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $callableResolver = $app->getCallableResolver();
-
+$app->add(
+    new Session([
+        'name' => 'session-cog',
+        'autorefresh' => true,
+        'lifetime' => '1 hour',
+    ])
+);
 // Add Twig-View Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
 $app->addBodyParsingMiddleware();

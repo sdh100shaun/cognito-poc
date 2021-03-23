@@ -2,6 +2,7 @@
 {% block body %}
     <main class="govuk-main-wrapper " id="main-content" role="main">
         <h1 class="govuk-heading-xl">Sign in to your DVSA account</h1>
+        {{error}}
         <form method="post" action="/login" enctype="multipart/form-data">
             <div class="govuk-form-group">
 
